@@ -1,0 +1,175 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AttachmentType {
+  createdAt: DateTime!
+  filename: String!
+  id: ID!
+  mimeType: String!
+  path: String!
+  size: Int!
+  taskId: String!
+}
+
+type BoardColumnType {
+  boardId: String!
+  createdAt: DateTime!
+  id: ID!
+  name: String!
+  order: Int!
+  tasks: [TaskType!]!
+  updatedAt: DateTime!
+}
+
+type BoardType {
+  columns: [BoardColumnType!]!
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  members: [UserType!]!
+  name: String!
+  owner: UserType!
+  ownerId: String!
+  updatedAt: DateTime!
+}
+
+type CommentType {
+  author: UserType!
+  authorId: String!
+  content: String!
+  createdAt: DateTime!
+  id: ID!
+  taskId: String!
+  updatedAt: DateTime!
+}
+
+input CreateBoardInput {
+  description: String
+  memberIds: [String!]
+  name: String!
+}
+
+input CreateColumnInput {
+  boardId: String!
+  name: String!
+  order: Int!
+}
+
+input CreateTaskInput {
+  assigneeIds: [String!]
+  columnId: String!
+  description: String
+  dueDate: String
+  priority: String! = "MEDIUM"
+  title: String!
+}
+
+input CreateUserInput {
+  email: String!
+  name: String!
+  password: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  addBoardMember(boardId: String!, userId: String!): BoardType!
+  addTaskAssignee(taskId: String!, userId: String!): TaskType!
+  createBoard(input: CreateBoardInput!): BoardType!
+  createBoardColumn(input: CreateColumnInput!): BoardColumnType!
+  createComment(content: String!, taskId: String!): CommentType!
+  createTask(input: CreateTaskInput!): TaskType!
+  deleteBoard(id: String!): BoardType!
+  deleteBoardColumn(id: String!): BoardColumnType!
+  deleteComment(id: String!): CommentType!
+  deleteTask(id: String!): TaskType!
+  login(input: LoginInput!): TokenResponseDto!
+  refreshToken: TokenResponseDto!
+  register(input: CreateUserInput!): TokenResponseDto!
+  removeBoardMember(boardId: String!, userId: String!): BoardType!
+  removeTaskAssignee(taskId: String!, userId: String!): TaskType!
+  updateBoard(input: UpdateBoardInput!): BoardType!
+  updateBoardColumn(id: String!, name: String, order: Float): BoardColumnType!
+  updateTask(input: UpdateTaskInput!): TaskType!
+}
+
+type Query {
+  board(id: String!): BoardType!
+  boards: [BoardType!]!
+  comments(taskId: String!): [CommentType!]!
+  me: UserType!
+  task(id: String!): TaskType!
+  tasks: [TaskType!]!
+  user(id: String!): UserType!
+  users: [UserType!]!
+}
+
+type TaskType {
+  assignees: [UserType!]!
+  attachments: [AttachmentType!]!
+  columnId: String!
+  comments: [CommentType!]!
+  createdAt: DateTime!
+  creator: UserType!
+  creatorId: String!
+  description: String
+  dueDate: DateTime
+  id: ID!
+  priority: String!
+  title: String!
+  updatedAt: DateTime!
+}
+
+type TokenResponseDto {
+  accessToken: String!
+  user: UserDto!
+}
+
+input UpdateBoardInput {
+  description: String
+  id: String!
+  memberIds: [String!]
+  name: String
+}
+
+input UpdateTaskInput {
+  assigneeIds: [String!]
+  columnId: String
+  description: String
+  dueDate: String
+  id: String!
+  priority: String
+  title: String
+}
+
+type UserDto {
+  email: String!
+  id: String!
+  name: String!
+  role: String!
+}
+
+"""User role types"""
+enum UserRole {
+  ADMIN
+  USER
+}
+
+type UserType {
+  avatar: String
+  createdAt: DateTime!
+  email: String!
+  id: ID!
+  name: String!
+  role: UserRole!
+  updatedAt: DateTime!
+}

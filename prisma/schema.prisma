@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  password      String
+  avatar        String?
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  boards        Board[]   @relation("BoardMembers")
+  ownedBoards   Board[]   @relation("BoardOwner")
+  tasks         Task[]    @relation("TaskAssignees")
+  createdTasks  Task[]    @relation("TaskCreator")
+  comments      Comment[]
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model Board {
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  owner       User         @relation("BoardOwner", fields: [ownerId], references: [id])
+  members     User[]       @relation("BoardMembers")
+  columns     BoardColumn[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model BoardColumn {
+  id        String   @id @default(uuid())
+  name      String
+  order     Int
+  boardId   String
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  priority    TaskPriority @default(MEDIUM)
+  columnId    String
+  column      BoardColumn  @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  creatorId   String
+  creator     User         @relation("TaskCreator", fields: [creatorId], references: [id])
+  assignees   User[]       @relation("TaskAssignees")
+  dueDate     DateTime?
+  comments    Comment[]
+  attachments Attachment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  filename  String
+  path      String
+  mimeType  String
+  size      Int
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+} 
